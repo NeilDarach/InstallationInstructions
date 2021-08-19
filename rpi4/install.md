@@ -1,4 +1,4 @@
-== Apline Linux on a Raspberry Pi 4 ==
+== Apline Linux on a Raspberry Pi 4 with ZFS root ==
 
 Based on [Raspberry Pi 4 - Persistent system acting as a NAS and Time Machine>https://wiki.alpinelinux.org/wiki/Raspberry_Pi_4_-_Persistent_system_acting_as_a_NAS_and_Time_Machine].
 
@@ -42,35 +42,55 @@ During setup, select your keymap, hostname, etc, as desired. However, when asked
 
  apk update
  apk upgrade
- apk add cfdisk
- cfdisk /dev/mmcblk0
 
-In cfdisk, select “Free space” and the option “New”. It will suggest using the entire available space, so just press enter, then select the option “primary”, followed by “Write”. Type “yes” to write the partition table to disk, then select “Quit”.
+Create a ramdisk
+ mkdir /media/ramdisk
+ mount -t tmpfs -o size=2048M tmpfs /media/ramdisk
 
- apk add e2fsprogs
- mkfs.ext4 /dev/mmcblk0p2
- mount /dev/mmcblk0p2 /mnt
- setup-disk -m sys /mnt
- mount -o remount,rw /media/mmcblk0p1
-
-
-If setup-disk fails, because /dev/mmcblk0p2 isn't visible, then install partprobe and run it
-
-  apk install partprobe
-  partprobe /dev/mmcblk0
-
+And install into it
+ setup-disk -m sys /media/ramdisk
 
 If setup-disk fails, beacuase only vfat is supported then edit setup-disk to remove the is_rpi line and allow the other file types.
 
-Ignore the warnings about extlinux. This and the following trick was found in the Alpine Wiki, but in some confusing order. 
+Remount the disks and chroot to the new install
+ mount -o remount,rw /media/mmcblk0p1
+ mount -o bind /dev /media/ramdisk/dev
+ mount -o bind /media/mmcblk0p1/boot /media/ramdisk/boot
+ mount -o bind /sys /media/ramdisk/sys
+ mount -t proc none /media/ramdisk/proc
+ chroot /media/ramdisk
 
- rm -f /media/mmcblk0p1/boot/*
- cd /mnt
+
+fetch apks for later
+  apk fetch lz4-libs lzo squashfs-tools libintl libtirpc-conf krb5-conf libcom_err keyutils-libs libverto krb5-libs libtirpc zfs-libs zfs-openrc zfs-rpi4 zfs zfs-lts
+
+§
+
+
+Clear out the boot directory
+ rm -f /boot/boot/*
+ cd /media/ramdisk
  rm boot/boot
  mv boot/* /media/mmcblk0p1/boot/
  rm -Rf boot
  mkdir media/mmcblk0p1
  ln -s media/mmcblk0p1/boot boot
+
+
+
+
+
+ apk add cfdisk partx
+ cfdisk /dev/mmcblk0
+
+In cfdisk, select “Free space” and the option “New”. It will suggest using the entire available space, so just press enter, then select the option “primary”, followed by “Write”. Type “yes” to write the partition table to disk, then select “Quit”.
+
+ partx -a /dev/mmcblk0
+ apk add e2fsprogs
+ mkfs.ext4 /dev/mmcblk0p2
+ mount /dev/mmcblk0p2 /mnt
+ setup-disk -m sys /mnt
+ mount -o remount,rw /media/mmcblk0p1
 
 Now the mountpoints need fixing, so run:
 
@@ -177,10 +197,3 @@ With root not being able to login, you will instead login as “pi”. It is pos
 
  su
 
-=== References ===
-
-https://wiki.alpinelinux.org/wiki/Raspberry_Pi_4_-_Persistent_system_acting_as_a_NAS_and_Time_Machine
-
-https://serverfault.com/questions/36038/reread-partition-table-without-rebooting
-
-https://gitlab.alpinelinux.org/alpine/aports/-/issues/12353

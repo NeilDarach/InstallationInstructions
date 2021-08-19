@@ -1,0 +1,34 @@
+# Answer file for setup-alpine script
+# If you don't want to use a certain option, then comment it out
+
+# Use US layout with US variant
+KEYMAPOPTS="gb gb"
+
+# Set hostname to alpine-test
+HOSTNAMEOPTS="-n ha-pi"
+
+# Don't set INTERFACEOPTS, it doesn't support wlan0
+
+# Search domain of example.com, Google public nameserver
+DNSOPTS=""
+
+# Set timezone to UTC
+TIMEZONEOPTS="-z Europe/London"
+
+# set http/ftp proxy
+PROXYOPTS="none"
+
+# Add a random mirror
+APKREPOSOPTS="-r"
+
+# Install Openssh
+SSHDOPTS="-c openssh"
+
+# Use chrony
+NTPOPTS="-c chrony"
+
+#DISKOPTS="none"
+#LBUOPTS="none"
+#APKCACHEOPTS=""
+
+

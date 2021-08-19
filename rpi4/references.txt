@@ -1,0 +1,5 @@
+https://wiki.alpinelinux.org/wiki/Raspberry_Pi_4_-_Persistent_system_acting_as_a_NAS_and_Time_Machine
+
+https://serverfault.com/questions/36038/reread-partition-table-without-rebooting
+
+https://gitlab.alpinelinux.org/alpine/aports/-/issues/12353

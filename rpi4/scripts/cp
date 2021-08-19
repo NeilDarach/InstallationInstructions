@@ -1,0 +1,5 @@
+cp /sdcard/boot/vmlinux-rpi4 /media/sdcard/boot/vmlinux-rpi4.orig
+cp /sdcard/boot/initramfs-rpi4 /media/sdcard/boot/initramfs-rpi4.orig
+cp /boot/vmlinuz-rpi4 /media/sdcard/boot
+cp /boot/initramfs-rpi4 /media/sdcard/boot
+

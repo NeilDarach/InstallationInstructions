@@ -1,0 +1,7 @@
+enable_uart=1
+gpu_mem=32
+disable_overscan=1
+kermel=boot/vmlinuz-lts
+modloop=boot/modloop.squashfs
+modules=loop,squashfs,sd-mod,usb-storage,zfs
+initramfs initramfs-rpi4
